@@ -15,7 +15,8 @@
     "onCommand:hackasol.testrun",
     "onCommand:hackasol.analyzeCode",
     "onCommand:security-tool.runTests",
-    "onCommand:hackasol.generateTestCases"
+    "onCommand:hackasol.generateTestCases",
+    "onCommand:hackasol.codeAudit"  
   ],
   "contributes": {
     "commands": [
@@ -31,50 +32,64 @@
         "command": "hackasol.analyzeCode",
         "title": "Analyze Code",
         "category": "AI Security Assistant"
-    },
-    
-    {
+      },
+      {
         "command": "hackasol.generateTestCases",
         "title": "Generate Test Cases",
         "category": "AI Security Assistant"
-    }
+      },
+      {
+        "command": "hackasol.codeAudit", 
+        "title": "Code Audit",
+        "category": "AI Security Assistant"
+      }
     ],
     "menus": {
-            "editor/title": [
-                {
-                    "command": "hackasol.analyzeCode",
-                    "when": "editorLangId == javascript",
-                    "group": "navigation"
-                },
-                {
-                    "command": "hackasol.testrun",
-                    "when": "editorLangId == html || editorLangId == css || editorLangId == javascript",
-                    "group": "navigation"
-                },
-                {
-                    "command": "hackasol.generateTestCases",
-                    "when": "editorLangId == javascript",
-                    "group": "navigation"
-                }
-            ]
-          },
-    "commandPalette": [
-      {
+      "editor/title": [
+        {
           "command": "hackasol.analyzeCode",
           "when": "editorLangId == javascript",
-          "group": "AI Security Assistant"
-      },
-      {
-          "command": "security-tool.runTests",
-          "when": "editorLangId == javascript || editorLangId == html || editorLangId == css",
-          "group": "AI Security Assistant"
-      },
-      {
+          "group": "navigation"
+        },
+        {
+          "command": "hackasol.testrun",
+          "when": "editorLangId == html || editorLangId == css || editorLangId == javascript",
+          "group": "navigation"
+        },
+        {
           "command": "hackasol.generateTestCases",
-          "when": "editorTextFocus && editorLangId == javascript",
-          "group": "AI Security Assistant"
+          "when": "editorLangId == javascript",
+          "group": "navigation"
+        },
+        {
+          "command": "hackasol.codeAudit", 
+          "when": "editorLangId == javascript || editorLangId == typescript",
+          "group": "navigation"
+        }
+      ]
+    },
+    "commandPalette": [
+      {
+        "command": "hackasol.analyzeCode",
+        "when": "editorLangId == javascript",
+        "group": "AI Security Assistant"
+      },
+      {
+        "command": "security-tool.runTests",
+        "when": "editorLangId == javascript || editorLangId == html || editorLangId == css",
+        "group": "AI Security Assistant"
+      },
+      {
+        "command": "hackasol.generateTestCases",
+        "when": "editorTextFocus && editorLangId == javascript",
+        "group": "AI Security Assistant"
+      },
+      {
+        "command": "hackasol.codeAudit",  
+        "when": "editorTextFocus && editorLangId == javascript || editorLangId == typescript",
+        "group": "AI Security Assistant"
       }
-  ]
+    ]
   },
   "scripts": {
     "lint": "eslint .",

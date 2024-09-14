@@ -1,10 +1,13 @@
 // The module 'vscode' contains the VS Code extensibility API
+
 // Import the module and reference it with the alias vscode in your code below
+require('dotenv').config()
 const vscode = require('vscode');
 const {exec} = require('child_process');
 const {promisify} = require('util')
 const execPromise = promisify(exec);
 const { getTestCases,getRecommendations } = require('./chatgpt'); 
+const fs = require('fs');
 let sessionHistory = [];
 
 
@@ -203,13 +206,47 @@ Generate only JavaScript test cases in Jest format. Do not include any explanati
         });
 
         // Save the test cases to a new file
-        const fileName = `test_${Date.now()}.js`;
-        const filePath = vscode.Uri.file(`${vscode.workspace.rootPath}/${fileName}`);
+        /*const fileName = `test_${Date.now()}.js`;
+        const filePath = vscode.Uri.file(`${vscode.Uri}/${fileName}`);
         const edit = new vscode.WorkspaceEdit();
         edit.createFile(filePath, { ignoreIfExists: true });
         edit.insert(filePath, new vscode.Position(0, 0), testCases);
         await vscode.workspace.applyEdit(edit);
         await vscode.window.showTextDocument(filePath);
+        */
+        //
+        // Construct the file name
+        const fileName = `test_${Date.now()}.js`;
+
+        // Use workspace.fs to handle path and file creation
+        const workspaceFolde = vscode.workspace.workspaceFolders;
+        
+        
+        if (!workspaceFolde) {
+            vscode.window.showErrorMessage('No workspace folder is open');
+            return;
+        }
+        const workspaceFolder=workspaceFolde[0];
+
+
+        // Ensure the file path is valid for WSL2
+        const fileUri = vscode.Uri.joinPath(workspaceFolder.uri, fileName);
+
+        
+        console.log(fileUri);
+
+        // Write the file using workspace.fs
+        // Convert the test cases string to a Uint8Array (required by writeFile)
+        const encoder = new TextEncoder();
+        const testCasesData = encoder.encode(testCases);
+        console.log(testCasesData);
+        await vscode.workspace.fs.writeFile(fileUri, testCasesData);
+
+
+        // Open the newly created file in the editor
+        const document = await vscode.workspace.openTextDocument(fileUri);
+        await vscode.window.showTextDocument(document);
+
 
     } catch (error) {
         console.error('Error generating test cases:', error.response ? error.response.data : error.message);
@@ -410,10 +447,14 @@ function activate(context) {
                 {name:'YOYO',command:"\n echo helloo \n"},
                 { name: 'Web Technology Fingerprinting', command: `whatweb -v -a 3 ${targetUrl}` },
                 {name:'YOYO',command:"\n echo helloo \n"},
+                {
+                    name: 'Directory Enumeration (DNS) gobuster',
+                    command: `gobuster dns -d google.com -w /usr/share/wordlists/small.txt`
+                },
                 //{ name: 'SQL Injection Testing', command: `sqlmap -u ${targetUrl} --batch` },
-                //{name:'YOYO',command:"\n echo helloo \n"},
+                {name:'YOYO',command:"\n echo helloo \n"},
                 //{ name: 'Web Server Vulnerability Scan', command: `curl ${targetUrl} ` },
-                { name: 'Port and Service Enumeration', command: `sudo nmap -sV -T4 -O ${targetUrl}` }
+                { name: 'Port and Service Enumeration', command: `nmap -sV -T4 -O ${targetUrl}` }
                 
             ];
 
@@ -441,7 +482,47 @@ function activate(context) {
     });
 
 	context.subscriptions.push(disposable);
-	context.subscriptions.push(disposable2)
+	context.subscriptions.push(disposable2);
+    // New Code Audit Command (graudit on user code base)
+    const disposable3 = vscode.commands.registerCommand('hackasol.codeAudit', async () => {
+        console.log('Running source code audit...');
+
+        // Prompt user to select a folder for code audit
+        const folders = await vscode.window.showOpenDialog({
+            canSelectFiles: false,
+            canSelectFolders: true,
+            canSelectMany: false,
+            openLabel: 'Select Code Base Folder'
+        });
+
+        if (!folders || folders.length === 0) {
+            vscode.window.showWarningMessage('No folder selected for code audit.');
+            return;
+        }
+
+        const selectedFolder = folders[0].fsPath;
+
+        // Check if graudit is installed
+        if (!(await commandExists('graudit'))) {
+            vscode.window.showErrorMessage('graudit is not installed. Please install it to run the code audit.');
+            return;
+        }
+
+        // Run graudit on the selected folder
+        const terminal = vscode.window.createTerminal('Code Audit');
+        terminal.show();
+
+        try {
+            const { stdout, stderr } = await execPromise(`graudit ${selectedFolder}`,);            
+            if (stdout) terminal.sendText(stdout);
+            if (stderr) terminal.sendText(stderr);
+        } catch (error) {
+            terminal.sendText(`Error running graudit: ${error.message}`);
+        }
+
+        vscode.window.showInformationMessage('Code audit completed. Check the terminal for results.');
+    });
+    context
 }
 
 // This method is called when your extension is deactivated
