@@ -9,17 +9,71 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
   "main": "./extension.js",
+  "activationEvents": [
+    "onCommand:hackasol.helloWorld",
+    "onCommand:hackasol.testrun",
+    "onCommand:hackasol.analyzeCode",
+    "onCommand:security-tool.runTests",
+    "onCommand:hackasol.generateTestCases"
+  ],
   "contributes": {
-    "commands": [{
-      "command": "hackasol.helloWorld",
-      "title": "Hello World"
+    "commands": [
+      {
+        "command": "hackasol.helloWorld",
+        "title": "Hello World"
+      },
+      {
+        "command": "hackasol.testrun",
+        "title": "Test Run"
+      },
+      {
+        "command": "hackasol.analyzeCode",
+        "title": "Analyze Code",
+        "category": "AI Security Assistant"
     },
+    
     {
-      "command": "hackasol.testrun",
-      "title": "Test Run"
+        "command": "hackasol.generateTestCases",
+        "title": "Generate Test Cases",
+        "category": "AI Security Assistant"
     }
+    ],
+    "menus": {
+            "editor/title": [
+                {
+                    "command": "hackasol.analyzeCode",
+                    "when": "editorLangId == javascript",
+                    "group": "navigation"
+                },
+                {
+                    "command": "hackasol.testrun",
+                    "when": "editorLangId == html || editorLangId == css || editorLangId == javascript",
+                    "group": "navigation"
+                },
+                {
+                    "command": "hackasol.generateTestCases",
+                    "when": "editorLangId == javascript",
+                    "group": "navigation"
+                }
+            ]
+          },
+    "commandPalette": [
+      {
+          "command": "hackasol.analyzeCode",
+          "when": "editorLangId == javascript",
+          "group": "AI Security Assistant"
+      },
+      {
+          "command": "security-tool.runTests",
+          "when": "editorLangId == javascript || editorLangId == html || editorLangId == css",
+          "group": "AI Security Assistant"
+      },
+      {
+          "command": "hackasol.generateTestCases",
+          "when": "editorTextFocus && editorLangId == javascript",
+          "group": "AI Security Assistant"
+      }
   ]
   },
   "scripts": {
@@ -28,11 +82,16 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.93.0",
     "@types/mocha": "^10.0.7",
     "@types/node": "20.x",
-    "eslint": "^9.9.1",
+    "@types/vscode": "^1.93.0",
     "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.4.1"
+    "@vscode/test-electron": "^2.4.1",
+    "eslint": "^9.9.1"
+  },
+  "dependencies": {
+    "axios": "^1.7.7",
+    "dotenv": "^16.4.5",
+    "vscode": "^1.1.37"
   }
 }
