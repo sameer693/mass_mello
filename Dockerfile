@@ -15,26 +15,17 @@ RUN npm install -g @vscode/vsce
 
 # Install any additional dependencies here
 # For example, if you need ffuf, nikto, etc., add them
-RUN apt-get update && \
-    apt-get install -y \
-    ffuf \
-    nikto \
-    nmap \
-    gobuster \
-    sslyze \
-    wpscan \
-    sqlmap \
-    whatweb \
-    theharvester \
-    hydra \
-    traceroute \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update
+
+RUN apt-get install -y whatweb 
+     
+RUN rm -rf /var/lib/apt/lists/*
 
 # Copy the rest of your application code
 COPY . .
 
 # Install the VSCode extension
-RUN vsce package
+#RUN vsce package
 
 # Expose any ports if needed (e.g., for testing or debugging)
 EXPOSE 8080
